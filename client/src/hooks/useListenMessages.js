@@ -1,0 +1,25 @@
+import React, { useEffect } from 'react'
+import { useSocketContext } from '../context/SocketContext'
+import useConversation from '../zustand/useConversation';
+
+import notifaicationSound from '../assets/sounds/livechat-129007.mp3';
+
+const useListenMessages = () => {
+   const {socket} = useSocketContext();
+   const {messages, setMessages}  = useConversation();
+
+   useEffect(() =>{
+    socket?.on('newMessage', (newMessage) =>{
+        newMessage.shouldShake = true;
+        const sound = new Audio(notifaicationSound);
+        sound.play();
+        setMessages([...messages, newMessage]);
+    })
+
+    return () =>socket?.off('newMessage');
+    
+   },[socket, setMessages, messages])
+
+}
+
+export default useListenMessages
